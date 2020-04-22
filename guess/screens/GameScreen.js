@@ -1,28 +1,31 @@
 // Author: Lauren Lofton
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 
 import Input from '../components/Input'
-import NumberContainer from '../components/NumberContainer';
+
 import Card from '../components/Card';
 import DefaultStyles from '../constants/default-styles';
-import Colors from '../constants/colors'
-import GameOverScreen from './GameOverScreen';
+import Colors from '../constants/colors';
+import MainButton from '../components/MainButton';
+import SecondaryButton from '../components/SecondaryButton';
 
 
 const GameScreen = props => {
 
     const [currentGuess,setCurrentGuess] = useState('')
-    const [message, setMessage] = useState('I am thinking of a number between 1-100');
+    const [message, setMessage] = useState('I am thinking of a number between 1 and 100');
     const [rounds, setRounds] = useState(0);
     const [confirmed, setConfirmed] = useState(false);
-
+    const currentHigh = useRef(100);
+    const currentLow = useRef(1);
+    const [between, setBetween] = useState('')
+   
     const {randomNumber, onGameOver} = props;
-
 
     useEffect(() => {
         if (currentGuess === randomNumber) {
-        onGameOver(rounds);
+        onGameOver(rounds + 1);
         }
     }, [currentGuess, randomNumber, onGameOver]);
 
@@ -31,36 +34,34 @@ const GameScreen = props => {
         setConfirmed(false);
     };
 
-    
 
     const confirmInputHandler = () => {
         const chosenNumber = (parseInt(currentGuess));
-        if ((chosenNumber) < randomNumber)  {
-            setRounds(rounds+1),
-            setMessage('Your guess ' + currentGuess + ' is too low.')
+  
+        if (isNaN(chosenNumber) || chosenNumber <= 0 || chosenNumber > 99) {
+            Alert.alert('Invalid Number', 'Number has to be between 1 and 99.', 
+            [{text: 'Okay', style: 'destructive', onPress: resetInputHandler}])
+            return;
+        }
+        else if ((chosenNumber) < props.randomNumber)  {
+            setRounds(rounds+1);
+            setMessage('Your guess ' + currentGuess + ' is too low.');
+            currentLow.current = currentGuess;
+            setBetween('Hint: Choose a number between ' + currentLow.current + ' and ' + currentHigh.current);
             setCurrentGuess('');
         }
-        else if ((chosenNumber) > randomNumber) {
-            setRounds(rounds+1),
-            setMessage('Your guess ' + currentGuess + ' is too high.')
+        else if ((chosenNumber) > props.randomNumber) {
+            setRounds(rounds+1);
+            setMessage('Your guess ' + currentGuess + ' is too high.');
+            currentHigh.current = currentGuess;
+            setBetween('Hint: Choose a number between ' + currentLow.current + ' and ' + currentHigh.current);
             setCurrentGuess('');
-        }
-        else if ((chosenNumber) > randomNumber) {
-            setRounds(rounds+1)
-        }
-        else {
-            (currentGuess + ' is not a number, try again!')}
         
+        } 
         setConfirmed(true);
         setCurrentGuess(chosenNumber)
-        console.log("chosen " + chosenNumber)
-        console.log('random ' + randomNumber)
-        
-     
     };
 
-
-    
     return (
         <View style={styles.screen}>
             <Text style={styles.message}>{message}</Text>
@@ -76,10 +77,12 @@ const GameScreen = props => {
                      value={String(currentGuess)} />
                      
                 <View style={styles.buttonContainer}>
-                    <View style={styles.button}><Button title="Clear" onPress={resetInputHandler} color={Colors.accent} /></View>
-                    <View style={styles.button}><Button title="Enter" onPress={confirmInputHandler} color={Colors.primary} /></View>
+                    <View style={styles.button1}><SecondaryButton onPress={resetInputHandler}>Clear</SecondaryButton></View>
+                    <View style={styles.button2}><MainButton onPress={confirmInputHandler}>Enter</MainButton></View>
                 </View>
+                <Text style={styles.between}>{between}</Text>
             </Card>
+      
         </View>
     );
     
@@ -96,14 +99,26 @@ const styles = StyleSheet.create ({
         justifyContent: 'space-around',
         marginTop: 20,
         width: 300,
-        maxWidth: '80%'
+        maxWidth: '80%',
     },
-    button: {
+    button1: {
         width: 100,
+        borderRadius: 25,
+        backgroundColor: Colors.accent,
+        marginRight: 20,
+        
+    },
+    button2: {
+        width: 100,
+        borderRadius: 25,
+        backgroundColor: Colors.primary,
+        marginLeft: 20,
+        
     },
     message: {
-        fontSize: 18,
+        fontSize: 22,
         padding: 20,
+        textAlign: 'center',
     },
     inputContainer: {
         width: 300,
@@ -114,6 +129,11 @@ const styles = StyleSheet.create ({
         width: 50,
         textAlign: 'center'
     },
+    between: {
+        paddingVertical: 20,
+        fontSize: 20,
+        textAlign: 'center',
+    }
 });
 
 export default GameScreen

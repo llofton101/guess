@@ -4,8 +4,8 @@ import { View, Text, Button, StyleSheet, TouchableWithoutFeedback, Keyboard, Ale
 
 import Card from '../components/Card';
 import Colors from '../constants/colors';
-
-import TitleText from '../components/TitleText'
+import MainButton from '../components/MainButton';
+import TitleText from '../components/TitleText';
 
 
 const StartGameScreen = props => {
@@ -20,7 +20,7 @@ const StartGameScreen = props => {
             <Card style={styles.container}>
             <TitleText style={styles.title}>Start a New Game!</TitleText>
                 <View style={styles.buttonContainer}>
-                    <View><Button title="START GAME" color={Colors.primary} onPress={() => props.onStartGame(selectedNumber)} /></View>
+                    <View><MainButton style={styles.button} onPress={() => props.onStartGame(selectedNumber)}>START GAME</MainButton></View>
                 </View>
             </Card>
           
@@ -33,7 +33,9 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1,
         padding: 10,
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center',
+    
     },
     title: {
         marginVertical: 10,
@@ -48,10 +50,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         marginTop: 20,
         width: 300,
-        maxWidth: '80%'
+        maxWidth: '80%',
+        marginBottom: 30,
+        borderRadius: 25,
     },
     button: {
         width: 100,
+        paddingVertical: 20,
+        borderRadius: 25,
     },
 })
 
